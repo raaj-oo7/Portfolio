@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Heart, Mail } from 'lucide-react'
 import { FaGithub, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6'
 import { NAV_LINKS } from '@/constants'
+import { Mascot } from '@/components/Mascot'
 import { personal, socials } from '@/data/portfolio'
 import { scrollToSection } from '@/utils'
 
@@ -14,8 +15,8 @@ export function Footer() {
   return (
     <footer className="relative border-t border-(--line) pb-28 md:pb-8" aria-label="Footer">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 pt-10">
-        <button type="button" onClick={() => scrollToSection('home')} className="font-display text-gradient text-xl font-bold" aria-label="Back to top">
-          RM
+        <button type="button" onClick={() => scrollToSection('home')} className="transition-transform hover:scale-110" aria-label="Back to top">
+          <Mascot className="h-10 w-10" />
         </button>
 
         <nav aria-label="Footer navigation">

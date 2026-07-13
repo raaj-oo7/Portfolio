@@ -4,6 +4,7 @@ import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 import Tilt from 'react-parallax-tilt'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { GlassCard } from '@/components/ui/GlassCard'
+import { Mascot } from '@/components/Mascot'
 import { fadeUp, slideInLeft, slideInRight, staggerContainer, viewportOnce } from '@/animations/variants'
 import { about, personal } from '@/data/portfolio'
 
@@ -25,9 +26,9 @@ export function About() {
           <Tilt tiltMaxAngleX={8} tiltMaxAngleY={8} glareEnable glareMaxOpacity={0.15} glareBorderRadius="24px" scale={1.02}>
             <div className="glass noise glow-ring relative overflow-hidden rounded-3xl p-2">
               <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary-900/60 via-night-800 to-accent-purple/20">
-                {/* stylised monogram portrait placeholder — swap with /avatar.jpg */}
+                {/* mascot portrait placeholder — swap with /avatar.jpg */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.35),transparent_60%)]" />
-                <span className="font-display text-gradient text-8xl font-bold select-none">RM</span>
+                <Mascot className="h-52 w-52 drop-shadow-[0_0_28px_rgba(99,102,241,0.45)] md:h-64 md:w-64" />
                 <div className="absolute right-4 bottom-4 left-4 rounded-2xl px-4 py-3 glass-strong">
                   <p className="font-display text-sm font-semibold">{personal.name}</p>
                   <p className="text-xs text-(--fg-muted)">{personal.location} · {personal.roles[0]}</p>

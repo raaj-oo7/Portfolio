@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Mascot } from '@/components/Mascot'
 import { useAppStore } from '@/store/useAppStore'
 import { personal } from '@/data/portfolio'
 
@@ -95,7 +96,7 @@ export function LoadingScreen() {
               transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <span className="font-display text-gradient text-4xl font-bold">RM</span>
+              <Mascot className="h-[76px] w-[76px]" />
             </motion.div>
           </motion.div>
 
