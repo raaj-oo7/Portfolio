@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom'
 import { Hero } from '@/sections/Hero'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { scrollToSection } from '@/utils'
+import { setPageMeta } from '@/utils/seo'
+import { personal } from '@/data/portfolio'
 
 /* Below-the-fold sections are code-split so the hero paints fast. */
 const About = lazy(() => import('@/sections/About').then((m) => ({ default: m.About })))
@@ -24,6 +26,14 @@ function SectionFallback() {
 
 export default function Home() {
   const { hash } = useLocation()
+
+  // Reset document meta (blog pages set their own titles)
+  useEffect(() => {
+    setPageMeta({
+      title: `${personal.name} — React Developer & Creative Frontend Engineer`,
+      description: personal.tagline,
+    })
+  }, [])
 
   // Support /#section links (e.g. arriving from the blog): retry until the
   // lazy-loaded target section exists, then scroll to it.
