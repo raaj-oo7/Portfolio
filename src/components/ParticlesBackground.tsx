@@ -22,7 +22,7 @@ export const ParticlesBackground = memo(function ParticlesBackground() {
     background: { color: 'transparent' },
     particles: {
       number: {
-        value: quality === 'high' ? 90 : 30,
+        value: quality === 'high' ? 120 : 40,
         density: { enable: true, width: 1920, height: 1080 },
       },
       color: { value: ['#6366f1', '#a855f7', '#22d3ee', '#818cf8'] },
