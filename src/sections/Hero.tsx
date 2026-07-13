@@ -124,7 +124,7 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6 }}
-        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-(--fg-muted) transition-colors hover:text-primary-300"
+        className="absolute bottom-20 left-1/2 z-10 -translate-x-1/2 text-(--fg-muted) transition-colors hover:text-primary-300 lg:bottom-6"
         aria-label="Scroll to about section"
       >
         <motion.span

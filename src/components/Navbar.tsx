@@ -67,7 +67,7 @@ export function Navbar() {
           </button>
 
           {/* Desktop links */}
-          <ul className="hidden items-center gap-1 md:flex">
+          <ul className="hidden items-center gap-1 lg:flex">
             {NAV_LINKS.map((link) => (
               <li key={link.id}>
                 <button
@@ -122,7 +122,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMobileOpen((v) => !v)}
-              className="glass flex h-9 w-9 items-center justify-center rounded-full md:hidden"
+              className="glass flex h-9 w-9 items-center justify-center rounded-full lg:hidden"
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
             >
@@ -140,7 +140,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.25 }}
-            className="glass-strong fixed inset-x-4 top-20 z-[99] rounded-3xl p-4 md:hidden"
+            className="glass-strong fixed inset-x-4 top-20 z-[99] rounded-3xl p-4 lg:hidden"
           >
             <ul className="grid grid-cols-2 gap-2">
               {NAV_LINKS.map((link) => (
@@ -167,7 +167,7 @@ export function Navbar() {
       {/* Mobile bottom nav */}
       <nav
         aria-label="Bottom navigation"
-        className="glass-strong fixed inset-x-4 bottom-4 z-[98] flex items-center justify-around rounded-full px-2 py-2 md:hidden"
+        className="glass-strong fixed inset-x-4 bottom-4 z-[98] flex items-center justify-around rounded-full px-2 py-2 lg:hidden"
       >
         {NAV_LINKS.slice(0, 5).map((link) => (
           <button
@@ -175,7 +175,7 @@ export function Navbar() {
             type="button"
             onClick={() => go(link.id)}
             className={cn(
-              'rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors',
+              'rounded-full px-2 py-1.5 text-[10px] font-semibold whitespace-nowrap transition-colors sm:px-3 sm:text-[11px]',
               isActive(link.id)
                 ? 'bg-gradient-to-r from-primary-600 to-accent-purple text-white'
                 : 'text-(--fg-muted)',

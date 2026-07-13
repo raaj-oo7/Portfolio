@@ -22,7 +22,7 @@ export function BackToTop() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.6, y: 16 }}
           onClick={() => scrollToSection('home')}
-          className="glass-strong glow-primary fixed right-6 bottom-24 z-[97] flex h-11 w-11 items-center justify-center rounded-full text-primary-300 transition-transform hover:scale-110 md:bottom-6 md:right-24"
+          className="glass-strong glow-primary fixed right-6 bottom-40 z-[97] flex h-11 w-11 items-center justify-center rounded-full text-primary-300 transition-transform hover:scale-110 lg:bottom-6 lg:right-24"
           aria-label="Back to top"
         >
           <ArrowUp size={18} />

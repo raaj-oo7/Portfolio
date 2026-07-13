@@ -13,7 +13,7 @@ export function Footer() {
   const navigate = useNavigate()
   const go = (id: string) => (id === 'blog' ? navigate('/blog') : scrollToSection(id))
   return (
-    <footer className="relative border-t border-(--line) pb-28 md:pb-8" aria-label="Footer">
+    <footer className="relative border-t border-(--line) pb-28 lg:pb-8" aria-label="Footer">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 pt-10">
         <button type="button" onClick={() => scrollToSection('home')} className="transition-transform hover:scale-110" aria-label="Back to top">
           <Mascot className="h-10 w-10" />

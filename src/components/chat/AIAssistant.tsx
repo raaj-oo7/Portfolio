@@ -127,7 +127,7 @@ export function AIAssistant() {
             whileHover={{ scale: 1.1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 18 }}
             onClick={() => setChatOpen(true)}
-            className="glow-primary fixed right-6 bottom-24 z-[96] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 via-accent-violet to-accent-purple text-white shadow-2xl md:bottom-6"
+            className="glow-primary fixed right-6 bottom-24 z-[96] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 via-accent-violet to-accent-purple text-white shadow-2xl lg:bottom-6"
             aria-label="Open AI assistant"
           >
             <Bot size={24} />

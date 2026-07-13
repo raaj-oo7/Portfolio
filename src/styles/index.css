@@ -81,6 +81,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* clip (not hidden): kills horizontal scroll from entrance-animation
+     transforms without creating a new scroll container */
+  overflow-x: clip;
 }
 
 html.lenis,
@@ -95,7 +98,7 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg);
   color: var(--fg);
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
