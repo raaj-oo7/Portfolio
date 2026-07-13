@@ -27,7 +27,9 @@ export class ContactError extends Error {}
 
 const emailJsConfigured = Boolean(SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY)
 
-async function sendViaApi(payload: ContactPayload): Promise<'sent' | 'unavailable'> {
+type ApiResult = 'sent' | 'unavailable' | 'unconfigured'
+
+async function sendViaApi(payload: ContactPayload): Promise<ApiResult> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 15_000)
   try {
@@ -37,8 +39,10 @@ async function sendViaApi(payload: ContactPayload): Promise<'sent' | 'unavailabl
       body: JSON.stringify(payload),
       signal: controller.signal,
     })
-    // API not deployed (static host) or not configured → try the next transport
-    if (res.status === 404 || res.status === 503) return 'unavailable'
+    // 503: API deployed but env keys missing — distinct so the owner can diagnose
+    if (res.status === 503) return 'unconfigured'
+    // 404: API not deployed (static host) → try the next transport
+    if (res.status === 404) return 'unavailable'
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as { error?: string } | null
       throw new ContactError(body?.error ?? `Request failed (${res.status})`)
@@ -87,5 +91,9 @@ export async function sendContactEmail(payload: ContactPayload): Promise<void> {
     return
   }
 
-  throw new ContactError('The contact service is unavailable — please email me directly.')
+  throw new ContactError(
+    apiResult === 'unconfigured'
+      ? 'Contact service not configured — the server is missing its email keys (owner: set RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL in Vercel and redeploy).'
+      : 'The contact service is unavailable — please email me directly.',
+  )
 }
