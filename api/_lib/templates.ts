@@ -98,27 +98,32 @@ export function adminEmailHtml(d: Inquiry, meta: InquiryMeta): string {
 
 export function replyEmailHtml(d: Inquiry): string {
   return shell(`
-    <h1 style="margin:0 0 14px;font-size:20px;color:#fff;">Thanks for reaching out, ${escapeHtml(d.name)} 👋</h1>
+    <h1 style="margin:0 0 14px;font-size:20px;color:#fff;">Hi ${escapeHtml(d.name)} 👋</h1>
     <p style="margin:0 0 10px;font-size:14px;line-height:1.7;color:#c7cbe6;">
-      Thank you for contacting me through my portfolio — your message has been <strong style="color:#34d399;">successfully received</strong>.
+      Thank you for reaching out through my portfolio.
+    </p>
+    <p style="margin:0 0 10px;font-size:14px;line-height:1.7;color:#c7cbe6;">
+      I have <strong style="color:#34d399;">successfully received your message</strong>.
     </p>
     <p style="margin:0 0 22px;font-size:14px;line-height:1.7;color:#c7cbe6;">
-      I'll carefully review your inquiry and reply <strong style="color:#fff;">within 24 hours</strong>.
+      I'll review your inquiry and get back to you <strong style="color:#fff;">within 24 hours</strong>.
     </p>
+    <p style="margin:0 0 8px;font-size:13px;color:#9aa0c3;">Here is a copy of your message:</p>
     <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px;">
       <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#818cf8;margin-bottom:6px;">Your message</div>
       <div style="font-size:13px;color:#9aa0c3;margin-bottom:8px;">Subject: <span style="color:#e5e7f5;">${escapeHtml(d.subject)}</span></div>
       <div style="font-size:14px;line-height:1.7;color:#e5e7f5;white-space:pre-wrap;">${escapeHtml(d.message)}</div>
     </div>
-    <p style="margin:22px 0 8px;font-size:14px;color:#c7cbe6;">Meanwhile, feel free to explore my work:</p>
+    <p style="margin:22px 0 8px;font-size:14px;color:#c7cbe6;">Meanwhile you can also connect with me:</p>
     <table role="presentation" cellpadding="0" cellspacing="0"><tr>
       <td style="padding-right:8px;"><a href="${BRAND.portfolio}" style="display:inline-block;background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;font-size:13px;font-weight:600;text-decoration:none;padding:10px 18px;border-radius:999px;">Portfolio</a></td>
       <td style="padding-right:8px;"><a href="${BRAND.github}" style="display:inline-block;border:1px solid rgba(255,255,255,.2);color:#e5e7f5;font-size:13px;font-weight:600;text-decoration:none;padding:10px 18px;border-radius:999px;">GitHub</a></td>
       <td><a href="${BRAND.linkedin}" style="display:inline-block;border:1px solid rgba(255,255,255,.2);color:#e5e7f5;font-size:13px;font-weight:600;text-decoration:none;padding:10px 18px;border-radius:999px;">LinkedIn</a></td>
     </tr></table>
-    <p style="margin:26px 0 0;font-size:14px;color:#c7cbe6;">Regards,<br/>
+    <p style="margin:22px 0 0;font-size:14px;color:#c7cbe6;">Thank you for your interest.</p>
+    <p style="margin:16px 0 0;font-size:14px;color:#c7cbe6;">Best Regards,<br/>
       <strong style="color:#fff;">${BRAND.name}</strong><br/>
-      <span style="font-size:12px;color:#9aa0c3;">${BRAND.role}</span>
+      <span style="font-size:12px;color:#9aa0c3;">React Developer<br/>Frontend Engineer</span>
     </p>
   `)
 }

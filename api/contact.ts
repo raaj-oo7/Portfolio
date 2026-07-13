@@ -111,8 +111,9 @@ export default async function handler(request: Request): Promise<Response> {
     ip,
   }
 
+  // 1) Admin notification (Reply-To = visitor). If THIS fails, the whole
+  //    request fails — the inquiry must never be lost silently.
   try {
-    // 1) notify admin (Reply-To = visitor)
     await sendEmail({
       from,
       to: [to],
@@ -120,20 +121,29 @@ export default async function handler(request: Request): Promise<Response> {
       subject: `🚀 New Portfolio Inquiry - ${data.name}`,
       html: adminEmailHtml(data, meta),
     })
-    // 2) auto-reply to the visitor (best effort — don't fail the request)
-    try {
-      await sendEmail({
-        from,
-        to: [data.email],
-        subject: 'Thank you for contacting Raj Makadia 👋',
-        html: replyEmailHtml(data),
-      })
-    } catch (e) {
-      console.error('[contact] auto-reply failed', e)
-    }
-    return json(200, { ok: true })
   } catch (e) {
-    console.error('[contact] send failed', e)
+    console.error('[contact] admin email failed', e)
     return json(502, { error: 'Email service failed — please try again or email me directly.' })
   }
+
+  // 2) Visitor auto-reply — sent only after the admin email succeeded.
+  //    Its failure is reported (response flag + server log) but does not
+  //    fail the request: the inquiry itself was delivered.
+  //    NOTE: with an unverified Resend domain (from = onboarding@resend.dev)
+  //    Resend rejects delivery to anyone except the account owner (403).
+  //    Verify a domain at resend.com/domains to lift this.
+  let autoReply: 'sent' | 'failed' = 'sent'
+  try {
+    await sendEmail({
+      from,
+      to: [data.email],
+      subject: 'Thank you for contacting Raj Makadia 👋',
+      html: replyEmailHtml(data),
+    })
+  } catch (e) {
+    autoReply = 'failed'
+    console.error(`[contact] auto-reply to ${data.email} failed`, e)
+  }
+
+  return json(200, { ok: true, autoReply })
 }
