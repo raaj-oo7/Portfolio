@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Clock } from 'lucide-react'
 import { blogPosts, getReadingTime } from '@/data/blog'
-import { fadeUp, staggerContainer, viewportOnce } from '@/animations/variants'
+import { fadeUp, staggerContainer } from '@/animations/variants'
 import { setPageMeta } from '@/utils/seo'
 import { personal } from '@/data/portfolio'
 import { cn } from '@/utils'
@@ -71,11 +71,12 @@ export default function Blog() {
         ))}
       </div>
 
-      {/* cards */}
+      {/* cards — animate on mount (whileInView on a tall grid never fires
+          on mobile, hiding every card); re-keyed so filtering re-animates */}
       <motion.div
+        key={category}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate="visible"
         variants={staggerContainer}
         className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
       >
