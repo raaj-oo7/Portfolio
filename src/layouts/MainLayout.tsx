@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { Toaster } from 'react-hot-toast'
+import { useEffect, type ReactNode } from 'react'
+import toast, { Toaster, useToasterStore } from 'react-hot-toast'
 import { AuroraBackground } from '@/components/AuroraBackground'
 import { ParticlesBackground } from '@/components/ParticlesBackground'
 import { CustomCursor } from '@/components/CustomCursor'
@@ -9,6 +9,20 @@ import { BackToTop } from '@/components/BackToTop'
 import { AIAssistant } from '@/components/chat/AIAssistant'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
+
+const MAX_TOASTS = 3
+
+/** Hard cap on simultaneously visible toasts — oldest are dismissed first. */
+function ToastLimiter() {
+  const { toasts } = useToasterStore()
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible)
+      .filter((_, i) => i >= MAX_TOASTS)
+      .forEach((t) => toast.dismiss(t.id))
+  }, [toasts])
+  return null
+}
 
 /** Global chrome around every page: backgrounds, nav, cursor, assistant. */
 export function MainLayout({ children }: { children: ReactNode }) {
@@ -30,6 +44,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
       <ErrorBoundary fallback={null}>
         <AIAssistant />
       </ErrorBoundary>
+      <ToastLimiter />
       <Toaster
         position="bottom-center"
         toastOptions={{

@@ -78,12 +78,13 @@ export function Contact() {
   const onSubmit = async (fields: ContactFields) => {
     const hash = JSON.stringify([fields.email, fields.subject, fields.message])
     const now = Date.now()
+    // Stable toast id: repeated clicks UPDATE one toast instead of stacking
     if (hash === lastSubmit.current.hash && now - lastSubmit.current.at < 5 * 60_000) {
-      toast('This message was already sent — I’ll reply soon!', { icon: '✋' })
+      toast('This message was already sent — I’ll reply soon!', { icon: '✋', id: 'contact-status' })
       return
     }
     if (now - lastSubmit.current.at < 20_000) {
-      toast('Please wait a moment before sending another message.', { icon: '⏳' })
+      toast('Please wait a moment before sending another message.', { icon: '⏳', id: 'contact-status' })
       return
     }
 
@@ -94,6 +95,7 @@ export function Contact() {
       reset()
       toast.success("Thank you! Your message has been sent successfully. I'll get back to you within 24 hours.", {
         duration: 6000,
+        id: 'contact-status',
       })
       setTimeout(() => setSuccess(false), 6000)
     } catch (err) {
@@ -101,7 +103,7 @@ export function Contact() {
         err instanceof ContactError
           ? err.message
           : 'Something went wrong — please try again or email me directly.'
-      toast.error(msg, { duration: 6000 })
+      toast.error(msg, { duration: 6000, id: 'contact-status' })
     }
   }
 
