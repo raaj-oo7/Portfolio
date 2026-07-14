@@ -4,6 +4,7 @@ import { Html, Stars } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { skills, type Skill } from '@/data/portfolio'
+import { SKILL_ICONS } from '@/components/skillIcons'
 import { useAppStore } from '@/store/useAppStore'
 
 interface GalaxyProps {
@@ -28,6 +29,7 @@ function Planet({
   const groupRef = useRef<THREE.Group>(null)
   const meshRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
+  const SkillIcon = SKILL_ICONS[skill.name]
 
   // distribute planets across 3 orbital rings
   const ring = index % 3
@@ -87,6 +89,18 @@ function Planet({
         <sphereGeometry args={[size, 16, 12]} />
         <meshBasicMaterial color={skill.color} transparent opacity={dimmed ? 0.02 : hovered ? 0.18 : 0.08} depthWrite={false} />
       </mesh>
+      {/* tech logo stamped on the planet */}
+      {SkillIcon && (
+        <Html center distanceFactor={9} zIndexRange={[35, 0]} className="pointer-events-none">
+          <SkillIcon
+            size={Math.round(14 + (skill.level / 100) * 22)}
+            color="#ffffff"
+            className={dimmed ? 'opacity-20' : 'opacity-90'}
+            // subtle dark halo so the white glyph reads on bright planets
+            style={{ filter: 'drop-shadow(0 1px 4px rgba(5,8,22,0.65))' }}
+          />
+        </Html>
+      )}
       {/* name label */}
       <Html center distanceFactor={11} zIndexRange={[40, 0]} position={[0, size + 0.32, 0]}>
         <button

@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useNearViewport } from '@/hooks/useNearViewport'
+import { SKILL_ICONS } from '@/components/skillIcons'
 import { skills, type Skill } from '@/data/portfolio'
 
 const SkillsGalaxy = lazy(() =>
@@ -72,10 +73,15 @@ export function Skills() {
               </button>
 
               <span
-                className="inline-block h-12 w-12 rounded-full"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full"
                 style={{ background: `radial-gradient(circle at 35% 30%, ${selected.color}, transparent 90%)`, boxShadow: `0 0 32px ${selected.color}66` }}
                 aria-hidden
-              />
+              >
+                {(() => {
+                  const Icon = SKILL_ICONS[selected.name]
+                  return Icon ? <Icon size={22} color="#fff" style={{ filter: 'drop-shadow(0 1px 3px rgba(5,8,22,0.6))' }} /> : null
+                })()}
+              </span>
               <h3 className="font-display mt-4 text-2xl font-bold">{selected.name}</h3>
               <p className="mt-0.5 font-mono text-xs text-(--fg-muted)">
                 {selected.category} · {selected.years} years experience
