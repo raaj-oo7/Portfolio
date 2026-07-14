@@ -8,6 +8,7 @@ import { ScrollProgress } from '@/components/ScrollProgress'
 import { BackToTop } from '@/components/BackToTop'
 import { AIAssistant } from '@/components/chat/AIAssistant'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { useActiveSection } from '@/hooks/useActiveSection'
 import { useAppStore } from '@/store/useAppStore'
 
 const MAX_TOASTS = 3
@@ -27,6 +28,9 @@ function ToastLimiter() {
 /** Global chrome around every page: backgrounds, nav, cursor, assistant. */
 export function MainLayout({ children }: { children: ReactNode }) {
   const introDone = useAppStore((s) => s.introDone)
+  // Must live inside <BrowserRouter> (this component does) — it calls
+  // useLocation() to re-arm the section observer on every route change.
+  useActiveSection(introDone)
 
   return (
     <>

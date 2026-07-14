@@ -4,7 +4,6 @@ import { LoadingScreen } from '@/components/LoadingScreen'
 import { MainLayout } from '@/layouts/MainLayout'
 import { useLenis } from '@/hooks/useLenis'
 import { useDeviceQuality } from '@/hooks/useDeviceQuality'
-import { useActiveSection } from '@/hooks/useActiveSection'
 import { useAppStore } from '@/store/useAppStore'
 import Home from '@/pages/Home'
 
@@ -21,7 +20,6 @@ export default function App() {
 
   useDeviceQuality()
   useLenis(introDone)
-  useActiveSection(introDone)
 
   return (
     <BrowserRouter>
