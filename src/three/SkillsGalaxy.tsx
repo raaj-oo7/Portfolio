@@ -1,5 +1,5 @@
 import { Suspense, useMemo, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, Stars } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
@@ -31,13 +31,16 @@ function Planet({
   const [hovered, setHovered] = useState(false)
   const SkillIcon = SKILL_ICONS[skill.name]
 
-  // distribute planets across 3 orbital rings
+  // distribute planets across 3 orbital rings, evenly spaced WITHIN each
+  // ring (same-ring planets share a speed, so the spacing never collapses)
   const ring = index % 3
+  const ringIndex = Math.floor(index / 3)
+  const ringCount = Math.max(1, Math.ceil((total - ring) / 3))
   const radius = 2.3 + ring * 1.35
   const speed = 0.14 - ring * 0.035
-  const phase = (index / total) * Math.PI * 2 * 1.61803
+  const phase = (ringIndex / ringCount) * Math.PI * 2 + ring * 1.1
   const size = 0.22 + (skill.level / 100) * 0.26
-  const yTilt = useMemo(() => Math.sin(index * 2.4) * 0.55, [index])
+  const yTilt = useMemo(() => Math.sin(index * 2.4) * 0.28, [index])
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
@@ -173,14 +176,19 @@ function OrbitRings() {
 
 function GalaxyScene({ onSelect, selected }: GalaxyProps) {
   const groupRef = useRef<THREE.Group>(null)
+  // shrink the whole galaxy on narrow canvases so the outer ring never clips
+  const width = useThree((state) => state.size.width)
+  const responsiveScale = Math.min(1, width / 820)
+
   useFrame(({ clock, pointer }) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = clock.elapsedTime * 0.04 + pointer.x * 0.25
-      groupRef.current.rotation.x = -0.28 + pointer.y * 0.12
+      // steeper viewing angle separates the rings on screen
+      groupRef.current.rotation.x = -0.5 + pointer.y * 0.1
     }
   })
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={responsiveScale}>
       <Core />
       <OrbitRings />
       {skills.map((skill, i) => (
