@@ -10,7 +10,8 @@ import { cn } from '@/utils'
 /** Vertical timeline that draws itself on scroll; cards expand for details. */
 export function Experience() {
   const lineRef = useRef<HTMLDivElement>(null)
-  const [expanded, setExpanded] = useState<number | null>(0)
+  // all cards collapsed by default; click a card header to expand
+  const [expanded, setExpanded] = useState<number | null>(null)
 
   const { scrollYProgress } = useScroll({
     target: lineRef,

@@ -201,6 +201,11 @@ body {
   transform-origin: top;
 }
 
+/* Flat-top hexagon tiles (skills tech-tree) */
+.hex-shape {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
 /* Mascot animations (see src/components/Mascot.tsx + public/favicon.svg) */
 .mascot-wave {
   animation: mascot-wave 1.8s ease-in-out infinite;

@@ -9,23 +9,23 @@ import { useNearViewport } from '@/hooks/useNearViewport'
 import { personal, socials } from '@/data/portfolio'
 import { scrollToSection } from '@/utils'
 
-const WorkspaceScene = lazy(() =>
-  import('@/three/WorkspaceScene').then((m) => ({ default: m.WorkspaceScene })),
+const HeroGalaxy = lazy(() =>
+  import('@/three/HeroGalaxy').then((m) => ({ default: m.HeroGalaxy })),
 )
 
 const socialIcons = { github: FaGithub, linkedin: FaLinkedinIn, twitter: FaXTwitter, mail: Mail } as const
 
-/** Fullscreen cinematic hero with the interactive 3D workspace. */
+/** Fullscreen cinematic hero over a developer galaxy-orbit scene. */
 export function Hero() {
   // Only run the WebGL scene while the hero is actually on screen
   const { ref: stageRef, visible } = useNearViewport<HTMLDivElement>('150px')
 
   return (
     <section id="home" className="relative flex min-h-svh flex-col overflow-hidden" aria-label="Introduction">
-      {/* 3D workspace fills the hero */}
+      {/* galaxy orbit background */}
       <div ref={stageRef} className="absolute inset-0">
         <ErrorBoundary fallback={<div className="h-full w-full bg-gradient-to-b from-transparent to-primary-900/20" />}>
-          <Suspense fallback={null}>{visible && <WorkspaceScene />}</Suspense>
+          <Suspense fallback={null}>{visible && <HeroGalaxy />}</Suspense>
         </ErrorBoundary>
         {/* readability gradient */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-(--bg)/60 via-transparent to-(--bg)" />
