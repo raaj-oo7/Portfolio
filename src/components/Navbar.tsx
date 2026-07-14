@@ -142,16 +142,16 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.25 }}
-            className="glass-strong fixed inset-x-4 top-20 z-[99] rounded-3xl p-4 lg:hidden"
+            className="glass-strong fixed top-20 right-4 z-[99] w-44 rounded-2xl p-2 lg:hidden"
           >
-            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <ul className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
                 <li key={link.id}>
                   <button
                     type="button"
                     onClick={() => go(link.id)}
                     className={cn(
-                      'w-full rounded-2xl px-4 py-3 text-left text-sm font-medium transition-colors',
+                      'w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors',
                       isActive(link.id)
                         ? 'bg-gradient-to-r from-primary-600 to-accent-purple text-white'
                         : 'text-(--fg-muted) hover:bg-white/5',
