@@ -206,6 +206,18 @@ body {
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
+/* Honeycomb sizing scales continuously with viewport width so a 4-wide row
+   never overflows a narrow phone (the fixed-px sizing this replaced clipped
+   the last hexagon off-screen below ~420px, with no way to reach it since
+   the page clips horizontal overflow). */
+.hex-honeycomb {
+  --hex-w: clamp(60px, 19vw, 120px);
+  --hex-h: calc(var(--hex-w) * 0.87);
+}
+.hex-row + .hex-row {
+  margin-top: calc(var(--hex-h) * -0.22);
+}
+
 /* Mascot animations (see src/components/Mascot.tsx + public/favicon.svg) */
 .mascot-wave {
   animation: mascot-wave 1.8s ease-in-out infinite;

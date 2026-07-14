@@ -4,7 +4,6 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { SKILL_ICONS } from '@/components/skillIcons'
 import { fadeUp, scaleIn, staggerContainer, viewportOnce } from '@/animations/variants'
 import { skills, type Skill } from '@/data/portfolio'
-import { cn } from '@/utils'
 
 /* ------------------------------ tech tree data ---------------------------- */
 
@@ -51,23 +50,24 @@ function HexTile({ skill, selected, onSelect }: { skill: Skill; selected: boolea
       className="group relative transition-transform duration-200 hover:z-10 hover:scale-110 focus-visible:z-10 focus-visible:scale-110 focus-visible:outline-none"
       style={{ filter: selected ? `drop-shadow(0 0 16px ${skill.color}88)` : undefined }}
     >
-      {/* outer hex = border tinted by category; inner hex = tile face */}
+      {/* outer hex = border tinted by category; inner hex = tile face.
+          Sized off the --hex-w/--hex-h vars set on the honeycomb wrapper
+          so tiles shrink to fit any viewport instead of overflowing it. */}
       <div
-        className="hex-shape relative h-[82px] w-[94px] sm:h-[104px] sm:w-[120px]"
+        className="hex-shape relative w-(--hex-w) h-(--hex-h)"
         style={{ background: selected ? `linear-gradient(150deg, ${cat}, ${skill.color})` : `${cat}44` }}
       >
         <div className="hex-shape absolute inset-[2px] flex flex-col items-center justify-center gap-1 bg-night-900/95">
           {Icon && (
             <Icon
-              size={22}
               color={skill.color}
-              className="transition-transform duration-200 group-hover:scale-110 sm:h-7 sm:w-7"
+              className="h-[18px] w-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110 sm:h-7 sm:w-7"
             />
           )}
-          <span className="max-w-[86%] truncate font-mono text-[9px] font-semibold text-white/85 sm:text-[10px]">
+          <span className="max-w-[86%] truncate font-mono text-[8px] font-semibold text-white/85 sm:text-[10px]">
             {skill.name}
           </span>
-          <span className="font-mono text-[8px] text-(--fg-muted) sm:text-[9px]">{skill.level}%</span>
+          <span className="font-mono text-[7px] text-(--fg-muted) sm:text-[9px]">{skill.level}%</span>
         </div>
       </div>
     </motion.button>
@@ -113,16 +113,18 @@ export function Skills() {
       </motion.ul>
 
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        {/* honeycomb */}
+        {/* honeycomb — --hex-w/--hex-h scale fluidly with viewport width so
+            the widest row (4 tiles) always fits; overflow-x-auto is a safety
+            net for extreme narrow widths so a tile can never go unreachable */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainer}
-          className="flex flex-col items-center"
+          className="hex-honeycomb flex w-full flex-col items-center overflow-x-auto py-2"
         >
           {rows.map((row, ri) => (
-            <div key={ri} className={cn('flex justify-center gap-2 sm:gap-2.5', ri > 0 && '-mt-4 sm:-mt-5')}>
+            <div key={ri} className="hex-row flex justify-center gap-1.5 sm:gap-2.5">
               {row.map((skill) => (
                 <HexTile key={skill.name} skill={skill} selected={selected.name === skill.name} onSelect={setSelected} />
               ))}
