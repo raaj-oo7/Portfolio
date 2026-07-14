@@ -27,8 +27,12 @@ export function Hero() {
         <ErrorBoundary fallback={<div className="h-full w-full bg-gradient-to-b from-transparent to-primary-900/20" />}>
           <Suspense fallback={null}>{visible && <HeroGalaxy />}</Suspense>
         </ErrorBoundary>
-        {/* readability gradient */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-(--bg)/60 via-transparent to-(--bg)" />
+        {/* readability: the old gradient was fully transparent right behind
+            the headline — the one place it mattered most. This dims a soft
+            oval directly behind the text column while keeping the scene
+            vivid at the edges, plus a lighter overall haze top-to-bottom. */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-(--bg)/70 via-(--bg)/25 to-(--bg)" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_62%_56%_at_50%_46%,var(--bg)_0%,transparent_72%)] opacity-85" />
       </div>
 
       {/* content */}
@@ -46,7 +50,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display text-5xl leading-[1.05] font-bold tracking-tight text-balance md:text-7xl"
+          className="font-display text-5xl leading-[1.05] font-bold tracking-tight text-balance drop-shadow-[0_2px_18px_rgba(0,0,0,0.65)] md:text-7xl"
         >
           Hello, I'm <span className="text-gradient">{personal.name}</span>
         </motion.h1>
@@ -55,7 +59,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65, duration: 0.8 }}
-          className="font-display mt-5 h-10 text-2xl font-semibold text-(--fg-muted) md:text-3xl"
+          className="font-display mt-5 h-10 text-2xl font-semibold text-(--fg-muted) drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)] md:text-3xl"
           aria-live="polite"
         >
           <TypeAnimation
@@ -72,7 +76,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.8 }}
-          className="mt-6 max-w-xl text-base text-pretty text-(--fg-muted) md:text-lg"
+          className="mt-6 max-w-xl text-base text-pretty text-(--fg-muted) drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] md:text-lg"
         >
           {personal.tagline}
         </motion.p>

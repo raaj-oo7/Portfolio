@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Tilt from 'react-parallax-tilt'
@@ -6,7 +7,8 @@ import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { fadeUp, slideInLeft, slideInRight, staggerContainer, viewportOnce } from '@/animations/variants'
-import { about } from '@/data/portfolio'
+import { about, personal, socials } from '@/data/portfolio'
+import { scrollToSection } from '@/utils'
 
 /* ----------------------------- terminal card ----------------------------- */
 
@@ -19,39 +21,58 @@ const STACK_COLORS: Record<string, string> = {
   AI: '#34d399',
 }
 
+function StackList() {
+  return (
+    <div className="mt-1 mb-3 flex flex-wrap gap-x-4 gap-y-1">
+      {Object.entries(STACK_COLORS).map(([tech, color]) => (
+        <span key={tech} style={{ color }}>
+          {tech}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function WhoAmI() {
+  return (
+    <div className="mt-1 mb-3">
+      <p className="font-semibold text-white">Raj Makadia</p>
+      <p className="text-(--fg-muted)">React Developer</p>
+      <p className="text-(--fg-muted)">Frontend Engineer</p>
+      <p className="text-(--fg-muted)">AI Enthusiast</p>
+    </div>
+  )
+}
+
+function StatusLine() {
+  return (
+    <p className="mt-1 mb-3 text-accent-emerald">
+      <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent-emerald align-middle" />
+      Available for new opportunities
+    </p>
+  )
+}
+
+/** Boot script the terminal types out on first scroll-into-view. */
 const SCRIPT = [
-  {
-    cmd: 'whoami',
-    out: (
-      <div className="mt-1 mb-3">
-        <p className="font-semibold text-white">Raj Makadia</p>
-        <p className="text-(--fg-muted)">React Developer</p>
-        <p className="text-(--fg-muted)">Frontend Engineer</p>
-        <p className="text-(--fg-muted)">AI Enthusiast</p>
-      </div>
-    ),
-  },
-  {
-    cmd: 'current-stack',
-    out: (
-      <div className="mt-1 mb-3 flex flex-wrap gap-x-4 gap-y-1">
-        {Object.entries(STACK_COLORS).map(([tech, color]) => (
-          <span key={tech} style={{ color }}>
-            {tech}
-          </span>
-        ))}
-      </div>
-    ),
-  },
-  {
-    cmd: 'status',
-    out: (
-      <p className="mt-1 mb-3 text-accent-emerald">
-        <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent-emerald align-middle" />
-        Available for new opportunities
-      </p>
-    ),
-  },
+  { cmd: 'whoami', out: <WhoAmI /> },
+  { cmd: 'current-stack', out: <StackList /> },
+  { cmd: 'status', out: <StatusLine /> },
+]
+
+const HELP_LINES: [string, string][] = [
+  ['whoami', 'who you are talking to'],
+  ['current-stack', 'technologies in daily rotation'],
+  ['status', 'availability for work'],
+  ['projects', 'jump to the projects section'],
+  ['contact', 'jump to the contact form'],
+  ['blog', 'open the blog'],
+  ['github', 'open GitHub in a new tab'],
+  ['linkedin', 'open LinkedIn in a new tab'],
+  ['resume', 'download the résumé'],
+  ['date', 'print the current date'],
+  ['clear', 'clear the terminal'],
+  ['help', 'show this list'],
 ]
 
 const Prompt = () => (
@@ -63,13 +84,39 @@ const Prompt = () => (
 
 const Caret = () => <span className="ml-0.5 inline-block h-3.5 w-[7px] animate-pulse bg-accent-cyan align-middle" />
 
-/** Glass terminal that "types" the whoami script when scrolled into view. */
+interface HistoryEntry {
+  id: number
+  cmd: string
+  out: ReactNode
+}
+
+let historyId = 0
+
+/**
+ * Glass terminal: types the boot script when scrolled into view, then hands
+ * control to a real, typeable prompt with a small command set wired into
+ * actual site navigation (projects/contact/blog/github/linkedin/resume).
+ */
 function TerminalCard() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.35 })
+  const navigate = useNavigate()
   const reduced =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const [step, setStep] = useState(reduced ? SCRIPT.length : 0) // current command index
-  const [typed, setTyped] = useState(0) // chars typed of the current command
+
+  // scripted boot sequence
+  const [step, setStep] = useState(reduced ? SCRIPT.length : 0)
+  const [typed, setTyped] = useState(0)
+
+  // interactive shell state
+  const [cleared, setCleared] = useState(false)
+  const [history, setHistory] = useState<HistoryEntry[]>([])
+  const [draft, setDraft] = useState('')
+  const [log, setLog] = useState<string[]>([])
+  const [logIndex, setLogIndex] = useState<number | null>(null)
+
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const interactive = step >= SCRIPT.length
 
   useEffect(() => {
     if (!inView || step >= SCRIPT.length) return
@@ -85,6 +132,121 @@ function TerminalCard() {
     return () => clearTimeout(t)
   }, [inView, step, typed])
 
+  // keep the newest line in view as the transcript grows
+  useEffect(() => {
+    const el = bodyRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [history, step, typed, cleared])
+
+  const openLink = (href: string) => window.open(href, '_blank', 'noopener,noreferrer')
+
+  function run(raw: string): ReactNode {
+    const cmd = raw.trim()
+    const lower = cmd.toLowerCase()
+
+    if (lower === 'help') {
+      return (
+        <ul className="mt-1 mb-3 space-y-0.5">
+          {HELP_LINES.map(([name, desc]) => (
+            <li key={name}>
+              <span className="inline-block w-28 text-accent-cyan">{name}</span>
+              <span className="text-(--fg-muted)">{desc}</span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    if (lower === 'whoami') return <WhoAmI />
+    if (lower === 'current-stack' || lower === 'skills') return <StackList />
+    if (lower === 'status') return <StatusLine />
+    if (lower === 'clear' || lower === 'cls') {
+      setCleared(true)
+      setHistory([])
+      return null
+    }
+    if (lower === 'projects') {
+      setTimeout(() => scrollToSection('projects'), 300)
+      return <p className="mt-1 mb-3 text-(--fg-muted)">Opening projects…</p>
+    }
+    if (lower === 'contact') {
+      setTimeout(() => scrollToSection('contact'), 300)
+      return <p className="mt-1 mb-3 text-(--fg-muted)">Opening contact…</p>
+    }
+    if (lower === 'blog') {
+      setTimeout(() => navigate('/blog'), 300)
+      return <p className="mt-1 mb-3 text-(--fg-muted)">Opening the blog…</p>
+    }
+    if (lower === 'github') {
+      const href = socials.find((s) => s.label === 'GitHub')?.href
+      if (href) openLink(href)
+      return <p className="mt-1 mb-3 text-(--fg-muted)">Opening GitHub in a new tab…</p>
+    }
+    if (lower === 'linkedin') {
+      const href = socials.find((s) => s.label === 'LinkedIn')?.href
+      if (href) openLink(href)
+      return <p className="mt-1 mb-3 text-(--fg-muted)">Opening LinkedIn in a new tab…</p>
+    }
+    if (lower === 'resume' || lower === 'cv') {
+      const a = document.createElement('a')
+      a.href = personal.resumeUrl
+      a.download = ''
+      a.click()
+      return <p className="mt-1 mb-3 text-(--fg-muted)">Downloading résumé…</p>
+    }
+    if (lower.startsWith('sudo')) {
+      return <p className="mt-1 mb-3 text-red-400">Nice try. Permission denied: you are not root here 😄</p>
+    }
+    if (lower === 'date') {
+      return <p className="mt-1 mb-3 text-(--fg-muted)">{new Date().toString()}</p>
+    }
+    if (lower.startsWith('echo ')) {
+      return <p className="mt-1 mb-3 text-white">{cmd.slice(5)}</p>
+    }
+    return (
+      <p className="mt-1 mb-3 text-red-400">
+        command not found: {cmd} — type <span className="text-accent-cyan">help</span> for a list
+      </p>
+    )
+  }
+
+  function submit() {
+    const cmd = draft
+    setDraft('')
+    setLogIndex(null)
+    const trimmed = cmd.trim()
+    if (trimmed === '') return
+    setLog((l) => [...l, cmd])
+    const out = run(cmd)
+    const lower = trimmed.toLowerCase()
+    if (lower !== 'clear' && lower !== 'cls') {
+      setHistory((h) => [...h, { id: historyId++, cmd, out }])
+    }
+  }
+
+  function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      submit()
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (log.length === 0) return
+      const next = logIndex === null ? log.length - 1 : Math.max(0, logIndex - 1)
+      setLogIndex(next)
+      setDraft(log[next])
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (logIndex === null) return
+      const next = logIndex + 1
+      if (next >= log.length) {
+        setLogIndex(null)
+        setDraft('')
+      } else {
+        setLogIndex(next)
+        setDraft(log[next])
+      }
+    }
+  }
+
   return (
     <div ref={ref}>
       <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} glareEnable glareMaxOpacity={0.1} glareBorderRadius="24px" scale={1.01}>
@@ -95,30 +257,59 @@ function TerminalCard() {
             <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
             <span className="h-3 w-3 rounded-full bg-green-400/80" />
             <span className="ml-2 font-mono text-xs text-(--fg-muted)">raj@portfolio: ~</span>
+            {interactive && <span className="ml-auto font-mono text-[10px] text-(--fg-muted)/70">try &apos;help&apos;</span>}
           </div>
 
-          {/* terminal body */}
-          <div className="noise relative min-h-72 p-5 font-mono text-[13px] leading-6 md:p-6 md:text-sm">
-            {SCRIPT.map((entry, i) => {
-              if (i > step) return null
-              const isTyping = i === step
-              return (
-                <div key={entry.cmd}>
+          {/* terminal body — a real, typeable shell once the boot script finishes */}
+          <div
+            ref={bodyRef}
+            onClick={() => inputRef.current?.focus()}
+            className="noise relative h-[340px] overflow-y-auto p-5 font-mono text-[13px] leading-6 md:h-[380px] md:p-6 md:text-sm"
+          >
+            {!cleared &&
+              SCRIPT.map((entry, i) => {
+                if (i > step) return null
+                const isTyping = i === step
+                return (
+                  <div key={entry.cmd}>
+                    <p className="text-white">
+                      <Prompt />
+                      {isTyping ? entry.cmd.slice(0, typed) : entry.cmd}
+                      {isTyping && <Caret />}
+                    </p>
+                    {!isTyping && entry.out}
+                  </div>
+                )
+              })}
+
+            {interactive &&
+              history.map((h) => (
+                <div key={h.id}>
                   <p className="text-white">
                     <Prompt />
-                    {isTyping ? entry.cmd.slice(0, typed) : entry.cmd}
-                    {isTyping && <Caret />}
+                    {h.cmd}
                   </p>
-                  {!isTyping && entry.out}
+                  {h.out}
                 </div>
-              )
-            })}
-            {/* idle prompt once the script finishes */}
-            {step >= SCRIPT.length && (
-              <p>
+              ))}
+
+            {/* live prompt */}
+            {interactive && (
+              <div className="flex items-center text-white">
                 <Prompt />
-                <Caret />
-              </p>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  autoFocus
+                  spellCheck={false}
+                  autoComplete="off"
+                  aria-label="Terminal command input — type help for a list of commands"
+                  className="min-w-0 flex-1 bg-transparent font-mono text-[13px] text-white caret-accent-cyan outline-none md:text-sm"
+                />
+              </div>
             )}
           </div>
         </div>
