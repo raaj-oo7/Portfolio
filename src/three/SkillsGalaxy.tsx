@@ -121,16 +121,20 @@ function Planet({
           {skill.name}
         </button>
       </Html>
-      {hovered && (
-        <Html center distanceFactor={10} zIndexRange={[50, 0]} position={[0, -(size + 0.5), 0]}>
-          <div className="glass-strong pointer-events-none w-40 rounded-xl px-3 py-2 text-center">
-            <p className="text-[10px] text-white/70">
-              {skill.category} · {skill.years}y · <span style={{ color: skill.color }}>{skill.level}/100</span>
-            </p>
-            <p className="mt-0.5 text-[9px] text-white/50">click for details</p>
-          </div>
-        </Html>
-      )}
+      {/* hover tooltip — always mounted, fades via opacity (mount/unmount
+          on hover caused visible blinking as planets drift under the cursor) */}
+      <Html center distanceFactor={10} zIndexRange={[50, 0]} position={[0, -(size + 0.5), 0]}>
+        <div
+          className={`glass-strong pointer-events-none w-40 rounded-xl px-3 py-2 text-center transition-opacity duration-200 ${
+            hovered ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <p className="text-[10px] text-white/70">
+            {skill.category} · {skill.years}y · <span style={{ color: skill.color }}>{skill.level}/100</span>
+          </p>
+          <p className="mt-0.5 text-[9px] text-white/50">click for details</p>
+        </div>
+      </Html>
     </group>
   )
 }
@@ -182,9 +186,11 @@ function GalaxyScene({ onSelect, selected }: GalaxyProps) {
 
   useFrame(({ clock, pointer }) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = clock.elapsedTime * 0.04 + pointer.x * 0.25
+      // parallax kept very gentle: strong pointer-follow slides planets
+      // under a stationary cursor, which flickers their hover states
+      groupRef.current.rotation.y = clock.elapsedTime * 0.04 + pointer.x * 0.06
       // steeper viewing angle separates the rings on screen
-      groupRef.current.rotation.x = -0.5 + pointer.y * 0.1
+      groupRef.current.rotation.x = -0.5 + pointer.y * 0.03
     }
   })
   return (

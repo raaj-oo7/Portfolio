@@ -17,7 +17,9 @@ export function Navbar() {
   const onBlog = pathname.startsWith('/blog')
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    // hysteresis: turn on past 40px, off below 8px — never flickers while
+    // smooth-scrolling hovers around a single boundary
+    const onScroll = () => setScrolled((prev) => (prev ? window.scrollY > 8 : window.scrollY > 40))
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -142,7 +144,7 @@ export function Navbar() {
             transition={{ duration: 0.25 }}
             className="glass-strong fixed inset-x-4 top-20 z-[99] rounded-3xl p-4 lg:hidden"
           >
-            <ul className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.id}>
                   <button
